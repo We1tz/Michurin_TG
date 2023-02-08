@@ -12,5 +12,7 @@ button_4 = "/предложить"
 keyboard.add(button_4)
 button_5  = "/find"
 keyboard.add(button_5)
+button_6  = "/мичуринфест"
+keyboard.add(button_6)
 
 

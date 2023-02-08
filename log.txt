@@ -48,3 +48,8 @@
 {'Name': 'Weitzz', 'ID': 1922232899, 'message': '/find', 'answer': ''}
 {'Name': 'Target_brony', 'ID': 129991831, 'message': 'ближайшее место', 'answer': 'Мой дом там, где есть Интернет.'}
 {'Name': 'Target_brony', 'ID': 129991831, 'message': '/help', 'answer': ''}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': 'хай', 'answer': 'Ха! Смешно!'}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': '1', 'answer': ''}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': 'Ага', 'answer': 'Фантастика.'}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': '1', 'answer': ''}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': 'Мичурин-Фест', 'answer': 'Мне было 17 лет, когда я приехал в Козлов'}

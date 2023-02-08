@@ -1,6 +1,7 @@
 import logging
 import os
 import sqlite3
+import time
 import aiogram
 import google.cloud.dialogflow
 from texts import txt
@@ -12,6 +13,13 @@ from config import telegram_token
 from states import Test
 
 storage = MemoryStorage()
+
+photo_1 = 'https://i.imgur.com/7dSl7Dh.png'
+photo_2 = 'https://i.imgur.com/kTyMLjz.png'
+photo_3 = 'https://i.imgur.com/cXK2hq8.png'
+photo_4 = 'https://i.imgur.com/vnMgzfh.png'
+photo_5 = 'https://i.imgur.com/NPG1ZRf.png'
+photo_6 = 'https://i.imgur.com/I2fUTXF.png'
 
 
 class User:
@@ -37,6 +45,17 @@ dp = aiogram.Dispatcher(bot, storage=storage)
 @dp.message_handler(commands="start")
 async def cmd_start(message: aiogram.types.Message):
     await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
+    time.sleep(6)
+    await message.answer(txt.advert_1)
+    time.sleep(8)
+    await message.answer(txt.advert_2)
+    time.sleep(1)
+    await message.answer_photo(photo_1)
+    await message.answer_photo(photo_2)
+    await message.answer_photo(photo_3)
+    await message.answer_photo(photo_4)
+    await message.answer_photo(photo_5)
+    await message.answer_photo(photo_6)
 
 @dp.message_handler(commands="find")
 async def locate(message: aiogram.types.Message):
@@ -45,9 +64,25 @@ async def locate(message: aiogram.types.Message):
     await bot.send_message(message.from_user.id, maps)
     await bot.send_message(message.from_user.id, "https://www.google.ru/maps/place/Мичуринский+краеведческий+музей/@52.8942197,40.5054534,17z/data=!3m1!4b1!4m5!3m4!1s0x413991162386f7e7:0x98f2e38b89522c6d!8m2!3d52.8942197!4d40.5076421")
 
+
+
 @dp.message_handler(commands='афиша')
 async def advert(message: types.Message):
     await bot.send_message(message.from_user.id, txt.ad)
+
+@dp.message_handler(commands='мичурин-фест')
+async def fest(message: types.Message):
+    await bot.send_message(message.from_user.id, txt.advert_1)
+    time.sleep(5)
+    await bot.send_message(message.from_user.id, txt.advert_2)
+    time.sleep(1)
+    await message.answer_photo(photo_1)
+    await message.answer_photo(photo_2)
+    await message.answer_photo(photo_3)
+    await message.answer_photo(photo_4)
+    await message.answer_photo(photo_5)
+    await message.answer_photo(photo_6)
+
 
 @dp.message_handler(commands='предложить')
 async def offer_update(message: types.Message):
