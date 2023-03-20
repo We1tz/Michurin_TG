@@ -1,0 +1,80 @@
+label{
+    display: none;
+}
+.sad_img img{
+    
+}
+
+.password-pass2 {
+    background: url(../img/pass2.svg) no-repeat right center;
+}
+
+.pass-btn{
+    cursor: pointer;
+}
+
+.poster__item-settings img{
+    cursor: pointer;
+}
+
+.poster-list{
+    overflow: scroll;
+    overflow-x: hidden;
+    height: 400px;
+}
+
+.quests_question{
+    border: 2px solid #dee2e6;
+    padding: 10px 9px;
+    border-radius: 8px;
+}
+
+.quests_question input[type="text"]{
+    width: 287px;
+    border: none;
+
+    outline:none;
+}
+
+.quests_question label article{
+    margin-right: 5px;
+}
+
+
+.add_varqestions {
+    transition: .5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    border: 2px dashed #74A3FF;
+    border-radius: 24.5px;
+    color: #74A3FF;
+}
+
+.add_varqestions:hover{
+    background-color: #74A3FF;
+    color:white;
+}
+
+.hidden{
+    display: none;
+}
+
+.mobile{
+    display: none;
+}
+
+.desktop{
+    display: block;
+}
+
+@media(max-width: 485px) {
+    .mobile{
+        display: block;
+    }
+    .desktop{
+        display: none;
+    }
+}
+
+.index-list{
+    list-style: none;
+}

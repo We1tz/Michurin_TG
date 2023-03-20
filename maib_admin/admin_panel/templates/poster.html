@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% block name %}Афиши{% endblock %}
+
+{% block content %}
+<!-- <div class="modal fade" id="deletePoster" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-danger">Удаление</span>
+                    Афиши</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите удалить <span class="fw-bold text-danger">Явление искусства: урок
+                    театроведения</span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger fw-bold">Да, хочу</button>
+                <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в другой
+                    раз</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editPoster" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-info">Редактирования</span>
+                    Афиши</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form action="">
+                    <input type="text" class="form-control mb-2" placeholder="Название мероприятия">
+                    <textarea class="form-control mb-2" name="" id="" cols="30" rows="10"
+                        placeholder="Описание мероприятия"></textarea>
+                    <input class="form-control mb-2" type="text" placeholder="Доп. информация">
+                    <input class="form-control mb-2" type="text" placeholder="Адрес">
+                    <input class="form-control mb-2" type="date" placeholder="Дата">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-outline-success">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+
+<div class="main">
+    <div class="poster container mt-5">
+        <div class="hello-text mb-5">
+            {% if user.is_authenticated and user.is_staff %}
+            <h2>Приветствую тебя, Администратор</h2>
+
+            {% else %}
+
+            <h2>Приветствую тебя, {{user.username}}</h2>
+
+            {% endif %}
+        </div>
+
+
+        <div class="mobile">
+            <div class="w-100 d-flex flex-column justify-content-center">
+                <h3 class="mb-2">Управление афишами</h3>
+
+                <div class="poster-list mb-5">
+                {% if poster_len == 0 %}
+                <div class="d-flex align-items-center">
+                    <div class="sad_img m-2">
+                        <img class="" src="../static/img/sad.svg" alt="">
+                    </div>
+                    <h2 class="mt-2">Афиши отсутсвуют</h2>
+                </div>
+
+                {% else %}
+
+
+                {% for poster in poster_list %}
+
+
+                <div class="modal fade" id="deletePosterMobile" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-danger">Удаление</span>
+                                    Афиши</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                Вы действительно хотите удалить <span class="fw-bold text-danger">Явление искусства: урок
+                                    театроведения</span>?
+                            </div>
+                            <div class="modal-footer">
+                                <a href="/deleteposter/{{poster.id}}" class="btn btn-danger fw-bold">Да, хочу</a>
+                                <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в другой
+                                    раз</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal fade" id="editPosterMobile" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-info">Редактирования</span>
+                                    Афиши</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="">
+                                    <input type="text" class="form-control mb-2" placeholder="Название мероприятия">
+                                    <textarea class="form-control mb-2" name="" id="" cols="30" rows="10"
+                                        placeholder="Описание мероприятия"></textarea>
+                                    <input class="form-control mb-2" type="text" placeholder="Доп. информация">
+                                    <input class="form-control mb-2" type="text" placeholder="Адрес">
+                                    <input class="form-control mb-2" type="date" placeholder="Дата">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                                <button type="button" class="btn btn-outline-success">Сохранить изменения</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                    <div class="card w-75 mb-3">
+                        <div class="card-body">
+                            <div class="poster__item-title d-flex align-items-center justify-content-between pb-5">
+                                <img src="../static/img/poster__item-icon.svg" alt="">
+                                <h5>{{poster.name}}</h6>
+                            </div>
+                            <div class="poster__item-content">
+                                <div class="poster__item-info d-flex align-items-center justify-content-between">
+                                    <div class="poster__item-data ">
+                                        <time class="fs-4 fw-semibold">{{poster.date}}</time>
+                                        <p class="text-primary">{{poster.adress}}</p>
+                                    </div>
+                                    <div class="poster__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        data-bs-title="Настройки">
+                                        <div class="dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink"
+                                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="../static/img/settings.svg" alt="">
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
+                                                <li><a class="dropdown-item" href="" data-bs-toggle="modal"
+                                                        data-bs-target="#editPosterMobile">Редактировать</a></li>
+                                                <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deletePosterMobile" href="">Удалить</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="row align-items-start">
+
+           
+
+            <div class="col mb-5 desktop">
+                <h3 class="mb-3">Управление афишами</h3>
+                <div class="poster-list mb-5">
+
+                    {% if poster_len == 0 %}
+                    <div class="d-flex align-items-center">
+                        <div class="sad_img m-2">
+                            <img class="" src="../static/img/sad.svg" alt="">
+                        </div>
+                        <h5 class="mt-2">Афиши отсутсвуют</h5>
+                    </div>
+                    {% else %}
+
+
+                    {% for poster in poster_list %}
+
+
+                    <div class="modal fade" id="deletePoster-{{poster.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><span
+                                            class="fw-bold text-danger">Удаление</span>
+                                        Афиши</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Вы действительно хотите удалить <span class="fw-bold text-danger">{{poster.name}}</span>?
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="/deleteposter/{{poster.id}}" class="btn btn-danger fw-bold">Да, хочу</a>
+                                    <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в
+                                        другой
+                                        раз</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="editPoster-{{poster.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><span
+                                            class="fw-bold text-info">Редактирования</span>
+                                        Афиши</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" action="/editposter/{{poster.id}}/">
+                                        {% csrf_token %}
+
+                                        <input name="name" value="{{poster.name}}" type="text" class="form-control mb-2" placeholder="Название мероприятия">
+                                        <select name="ageLim" class="form-select mb-3">
+                                            <option value="0+">0+</option>
+                                            <option value="16+">16+</option>
+                                            <option value="18+">18+</option>
+                                        </select>
+                                        <textarea class="form-control mb-2" name="desc" id="" cols="30" rows="10"
+                                            placeholder="Описание мероприятия">{{poster.desc}}</textarea>
+                                        <input name="addinfo" value="{{poster.addinfo}}" class="form-control mb-2" type="text" placeholder="Доп. информация">
+                                        <input name="addres" value="{{poster.addres}}" class="form-control mb-2" type="text" placeholder="Адрес">
+                                        <input name="date" value="{{poster.date}}" class="form-control mb-2" type="date" placeholder="Дата">
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-dismiss="modal">Закрыть</button>
+                                            <button type="submit" class="btn btn-outline-success">Сохранить изменения</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card w-75 mb-3">
+                        <div class="card-body">
+                            <div
+                                class="w-100 poster__item-title d-flex align-items-center justify-content-between pr-5">
+
+                                <div class="w-75">
+                                    <h5>{{ poster.name }}</h5>
+                                </div>
+                                <img src="../static/img/poster__item-icon.svg" alt="">
+                            </div>
+                            <div class="poster__item-content">
+                                <div class="poster__item-info d-flex align-items-center justify-content-between">
+                                    <div class="poster__item-data">
+                                        <time class="fs-4 fw-semibold">{{poster.date}}</time>
+                                        <p class="text-primary">{{poster.addres}}</p>
+                                        {% comment %}
+                                            <!-- <p>{{poster.author.username}}</p> -->
+                                        {% endcomment %}
+                                         <p>{{poster.author.username}}</p>
+                                    </div>
+                                    <div class="poster__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        data-bs-title="Настройки">
+                                        <div class="dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink"
+                                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="../static/img/settings.svg" alt="">
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
+                                                <li><a class="dropdown-item" href="" data-bs-toggle="modal"
+                                                        data-bs-target="#editPoster-{{poster.id}}">Редактировать</a></li>
+                                                <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deletePoster-{{poster.id}}" href="">Удалить</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
+
+
+
+
+            <div class="col">
+                <h3 class="mb-3">Добавление афишами</h3>
+                <form class="d-flex flex-column" method="post" action="/createposter/">
+                    {% csrf_token %}
+
+                    <input name="name" class="form-control mb-3" placeholder="Название мероприятия" type="text">
+                    <select name="ageLim" class="form-select mb-3">
+                        <option value="0+">0+</option>
+                        <option value="16+">16+</option>
+                        <option value="18+">18+</option>
+                    </select>
+                    <textarea name="desc" class="form-control mb-3" placeholder="Описание мероприятия" name="" id=""
+                        cols="30" rows="10"></textarea>
+                    <input name="addinfo" class="form-control mb-3" placeholder="Доп. информация" type="text">
+                    <input name="addres" class="form-control mb-3" placeholder="Адрес" type="text">
+                    <input name="date" class="form-control mb-3" placeholder="Дата" type="date">
+
+                    <div class="d-flex w-100">
+                        <button type="submit" class="btn btn-primary pr-5">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

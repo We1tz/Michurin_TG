@@ -1,15 +1,16 @@
 import logging
 import os
 import sqlite3
-import time
+
 import aiogram
 import google.cloud.dialogflow
-from texts import txt
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from keyboards import start_keyboard, locate
+
 from config import telegram_token
+from keyboards import start_keyboard
 from states import Test
+from texts import txt
 
 storage = MemoryStorage()
 

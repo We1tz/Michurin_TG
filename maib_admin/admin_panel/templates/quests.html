@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block name %}Викториы{% endblock %}
+
+{% block content %}
+
+
+    <div class="main">
+        {% if user.is_authenticated and user.is_staff %}
+        <div class="poster container mt-5">
+            <div class="hello-text mb-5">
+                <h2>Приветствую тебя, Администратор</h2>
+            </div>
+
+
+            <div class="row align-items-start">
+                <div class="col mb-5">
+                    <h3 class="mb-2">Управление викторинами</h3>
+                    <div class="quests-list mb-5">
+                        <div class="card w-75 mb-3">
+                            <div class="card-body">
+                                <div class="quests__item-title d-flex align-items-start pb-2">
+                                    <div class="img-quests pr-5">
+                                        <img src="img/quests.svg" alt="">
+                                    </div>
+                                    <h5>“Знание города
+                                        Мичуринска”</h6>
+
+                                </div>
+                                <div class="quests__item-content">
+                                    <div class="quests__item-info d-flex align-items-center justify-content-between">
+                                        <div class="quests__item-data">
+                                            <p class="">8 вопрос</p>
+                                        </div>
+                                        <div class="quests__item-settings" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" data-bs-title="Настройки">
+                                            <img src="img/settings.svg" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary text-start w-75">Новая викторина</button>
+                </div>
+
+
+
+                <div class="col">
+                    <form class="d-flex flex-column" action="">
+                        <input type="text" class="form-control" placeholder="Вопрос">
+                        <div class="quests_question mt-2">
+                            <input type="text" placeholder="Вариант ответа" class="quests_question">
+                            <div class="d-flex">
+                                <label for="" class="d-flex align-items-center">
+                                    <input type="checkbox" name="" id="">
+                                    <article class="p-1">Верно / Не верно</article>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="add_varqestions d-flex flex-column w-100 px-4 py-3 mt-2">
+                            <article class="text-center">Добавить новый вариант ответа</article>
+                        </div>
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-outline-primary">Добавить вопрос</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+
+        <div class="container mt-5 d-flex justify-content-center flex-column">
+            <h1 class="text-center mb-5">У вас нет доступа к этой странице</h1>
+            <a href="/poster" class="btn btn-primary">Вернуться обратно</a>
+        </div>
+
+        {% endif %}
+    </div>
+
+{% endblock %}

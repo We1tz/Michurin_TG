@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block name %}Редактирования Геолокации{% endblock %}
+
+{% block content %}
+
+<form action="POST">
+    {% csrf_token %}
+
+    <input value="{{geo.name}}" name="name" class="form-control mb-3" placeholder="Название локации" type="text">
+    <textarea value="{{geo.desc}}" name="desc" class="form-control mb-3" placeholder="Описание локации" id="" cols="30" rows="10"></textarea>
+    <input value="{{geo.link}}" name="link" class="form-control mb-3" placeholder="Сслыка на локацию" type="text">
+</form>
+
+{% endblock %}

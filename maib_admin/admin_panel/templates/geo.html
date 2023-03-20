@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block name %}Геолокация{% endblock %}
+
+{% block content %}
+
+<!-- <div class="modal fade" id="deleteGeo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-danger">Удаление</span>
+                    Геолокации</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите удалить <span class="fw-bold text-danger">Усадьба Мичурина</span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger fw-bold">Да, хочу</button>
+                <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в другой раз</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- <div class="modal fade" id="editGeo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><span class="fw-bold text-info">Редактирования</span>
+                    Геолокации</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form action="">
+                    <input type="text" class="form-control mb-2" placeholder="Название локации">
+                    <textarea class="form-control mb-2" name="" id="" cols="30" rows="10"
+                        placeholder="Описание локации"></textarea>
+                    <input class="form-control mb-2" type="text" placeholder="Ссылка на локацию">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-outline-success">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+
+<div class="main">
+    {% if user.is_authenticated and user.is_staff %}
+    <div class="poster container mt-5">
+        <div class="hello-text mb-5">
+            <h2>Приветствую тебя, Администратор</h2>
+        </div>
+
+        <div class="mobile">
+            <h3 class="mb-2">Управление локацией</h3>
+            <div class="geo-list">
+                {% for geo in geo_list %}
+
+                <div class="modal fade" id="editGeoMobile" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><span
+                                            class="fw-bold text-info">Редактирования</span>
+                                        Геолокации</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                                </div>
+                                <form action="/editgeo/">
+                                    <div class="modal-body">
+                                        <input value="{{geo.name}}" type="text" class="form-control mb-2"
+                                            placeholder="Название локации">
+                                        <textarea value="{{geo.desc}}" class="form-control mb-2" name="" id="" cols="30"
+                                            rows="10" placeholder="Описание локации"></textarea>
+                                        <input value="{{geo.link}}" class="form-control mb-2" type="text"
+                                            placeholder="Ссылка на локацию">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger"
+                                            data-bs-dismiss="modal">Закрыть</button>
+                                            <a href="/editgeo/{{geo.id}}" class="btn btn-outline-success">Сохранить
+                                                изменения</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="modal fade" id="deleteGeoMobile" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><span
+                                        class="fw-bold text-danger">Удаление</span>
+                                    Геолокации</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                Вы действительно хотите удалить <span class="fw-bold text-danger">{{geo.name}}</span>?
+                            </div>
+                            <div class="modal-footer">
+                                <a href="/deletegeo/{{geo.id}}" class="btn btn-danger fw-bold">Да,
+                                    хочу</a>
+                                <a class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в другой
+                                    раз</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="card w-75 mb-3">
+                    <div class="card-body">
+                        <div class="geo__item-title d-flex align-items-start justify-content-between pb-5">
+                            <h5>{{geo.name}}</h6>
+                                <img src="../static/img/geo.svg" alt="">
+                        </div>
+                        <div class="geo__item-content">
+                            <div class="geo__item-info d-flex align-items-center justify-content-between">
+                                <div class="geo__item-data">
+                                    <a href="https://www.google.com/maps/@{{geo.link}}"
+                                        class="text-primary fw-bold">{{geo.link}}</a>
+                                </div>
+                                <div class="geo__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Настройки">
+                                    <div class="dropdown">
+                                        <button class="btn btn-warning dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="" data-bs-toggle="modal"
+                                                    data-bs-target="#editGeoMobile">Редактировать</a></li>
+                                            <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteGeoMobile" href="">Удалить</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row align-items-start">
+            <div class="col mb-5 desktop">
+                <h3 class="mb-2">Управление локацией</h3>
+                <div class="geo-list">
+                    {% for geo in geo_list %}
+
+                    <div class="modal fade" id="editGeo" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><span
+                                            class="fw-bold text-info">Редактирования</span>
+                                        Геолокации</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                                </div>
+                                <form>
+                                    <div class="modal-body">
+                                        <input value="{{geo.name}}" type="text" class="form-control mb-2"
+                                            placeholder="Название локации">
+                                        <textarea value="{{geo.desc}}" class="form-control mb-2" name="" id="" cols="30"
+                                            rows="10" placeholder="Описание локации"></textarea>
+                                        <input value="{{geo.link}}" class="form-control mb-2" type="text"
+                                            placeholder="Ссылка на локацию">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger"
+                                            data-bs-dismiss="modal">Закрыть</button>
+                                        <a href="/editgeo/{{geo.id}}" class="btn btn-outline-success">Сохранить
+                                            изменения</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="deleteGeo" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><span
+                                            class="fw-bold text-danger">Удаление</span>
+                                        Геолокации</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Вы действительно хотите удалить <span class="fw-bold text-danger">Усадьба
+                                        Мичурина</span>?
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="/deletegeo/{{geo.id}}" type="button" class="btn btn-danger fw-bold">Да,
+                                        хочу</a>
+                                    <a type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Нет, в
+                                        другой раз</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card w-75 mb-3">
+                        <div class="card-body">
+                            <div class="geo__item-title d-flex align-items-start justify-content-between pb-5">
+                                <h5>{{geo.name}}</h6>
+                                    <img src="../static/img/geo.svg" alt="">
+                            </div>
+                            <div class="geo__item-content">
+                                <div class="geo__item-info d-flex align-items-center justify-content-between">
+                                    <div class="geo__item-data">
+                                        <a href="https://www.google.com/maps/@{{geo.link}}"
+                                            class="text-primary fw-bold">{{geo.link}}</a>
+                                    </div>
+                                    <div class="geo__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        data-bs-title="Настройки">
+                                        <div class="dropdown">
+                                            <button class="btn btn-warning dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="editgeo/{{geo.id}}" data-bs-toggle="modal"
+                                                        data-bs-target="#editGeo">Редактировать</a></li>
+                                                <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteGeo" href="">Удалить</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+            </div>
+
+
+
+            <div class="col">
+                <form class="d-flex flex-column" method="POST" action="/creategeo/">
+                    {% csrf_token %}
+
+                    <input name="name" class="form-control mb-3" placeholder="Название локации" type="text">
+                    <textarea name="desc" class="form-control mb-3" placeholder="Описание локации" id="" cols="30"
+                        rows="10"></textarea>
+                    <input name="link" class="form-control mb-3" placeholder="Сслыка на локацию" type="text">
+
+
+                    <button type="submit" class="btn btn-primary pr-5">Добавить</button>
+                    <!-- <input type="submit" value="OK"> -->
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    
+    <div class="container mt-5 d-flex justify-content-center flex-column">
+        <h1 class="text-center mb-5">У вас нет доступа к этой странице</h1>
+        <a href="/poster" class="btn btn-primary">Вернуться обратно</a>
+    </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}
