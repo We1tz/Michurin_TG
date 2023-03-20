@@ -5,7 +5,6 @@ import time
 import aiogram
 import google.cloud.dialogflow
 from texts import txt
-from aiogram import types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from keyboards import start_keyboard, locate
@@ -13,13 +12,6 @@ from config import telegram_token
 from states import Test
 
 storage = MemoryStorage()
-
-photo_1 = 'https://i.imgur.com/7dSl7Dh.png'
-photo_2 = 'https://i.imgur.com/kTyMLjz.png'
-photo_3 = 'https://i.imgur.com/cXK2hq8.png'
-photo_4 = 'https://i.imgur.com/vnMgzfh.png'
-photo_5 = 'https://i.imgur.com/NPG1ZRf.png'
-photo_6 = 'https://i.imgur.com/I2fUTXF.png'
 
 
 class User:
@@ -45,17 +37,6 @@ dp = aiogram.Dispatcher(bot, storage=storage)
 @dp.message_handler(commands="start")
 async def cmd_start(message: aiogram.types.Message):
     await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
-    time.sleep(6)
-    await message.answer(txt.advert_1)
-    time.sleep(8)
-    await message.answer(txt.advert_2)
-    time.sleep(1)
-    await message.answer_photo(photo_1)
-    await message.answer_photo(photo_2)
-    await message.answer_photo(photo_3)
-    await message.answer_photo(photo_4)
-    await message.answer_photo(photo_5)
-    await message.answer_photo(photo_6)
 
 @dp.message_handler(commands="find")
 async def locate(message: aiogram.types.Message):
@@ -68,20 +49,25 @@ async def locate(message: aiogram.types.Message):
 
 @dp.message_handler(commands='афиша')
 async def advert(message: types.Message):
-    await bot.send_message(message.from_user.id, txt.ad)
 
-@dp.message_handler(commands='мичурин-фест')
-async def fest(message: types.Message):
-    await bot.send_message(message.from_user.id, txt.advert_1)
-    time.sleep(5)
-    await bot.send_message(message.from_user.id, txt.advert_2)
-    time.sleep(1)
-    await message.answer_photo(photo_1)
-    await message.answer_photo(photo_2)
-    await message.answer_photo(photo_3)
-    await message.answer_photo(photo_4)
-    await message.answer_photo(photo_5)
-    await message.answer_photo(photo_6)
+    connect = sqlite3.connect('../../../Desktop/Проекты/maib_admin/db.sqlite3')
+    cursor = connect.cursor()
+    cursor.execute("""SELECT * FROM admin_panel_poster""")
+    results = cursor.fetchall()
+        # название result [id][1]
+        # описание result [id][2]
+        # дополнение к адресу result [id][3]
+        # адрес [id][4]
+        # дата [id][5]
+        # возраст
+        # организация
+        id = 5 # номер строчки в бд
+    await bot.send_message(message.from_user.id, f'Здравствуйте, ожидается мероприятие "{results[id][1]}"\n'
+          f'Описание: {results[id][2]}\n'
+          f'Мероприятие походит по адресу {results[id][4]}, {results[2][3]}\n'
+          f'Дата: {results[id][5]}\n'
+          f'Возраст: {results[id][6]}\n'
+        )
 
 
 @dp.message_handler(commands='предложить')
@@ -97,7 +83,7 @@ async def offer_update(message: types.Message):
     await message.answer(message_for_user)
     user = User(message.from_user.username, message.from_user.id, '')
     print('Пользователь создан')
-    connect = sqlite3.connect('users.db')
+    connect = sqlite3.connect('../../../Desktop/Проекты/users.db')
     cursor = connect.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS users(
                         name TEXT,
@@ -121,7 +107,7 @@ async def offer_update_1(message: types.Message, state: FSMContext):
 
     await state.update_data(new_offers=new_offers)
 
-    connect = sqlite3.connect('users.db')
+    connect = sqlite3.connect('../../../Desktop/Проекты/users.db')
     cursor = connect.cursor()
     user = User(message.from_user.first_name, message.from_user.id, new_offers)
     cursor.execute('UPDATE users SET offer=? WHERE id=?', (user.offer, user.id))
@@ -251,7 +237,7 @@ async def message_dialogflow(message: aiogram.types.Message):
         'answer': response.query_result.fulfillment_text
     }
 
-    with open('log.txt', 'a', encoding='utf-8') as txt:
+    with open('../../../Desktop/Проекты/log.txt', 'a', encoding='utf-8') as txt:
         print(log, file=txt)
 
 
