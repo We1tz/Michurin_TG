@@ -114,18 +114,27 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="">
-                                    <input type="text" class="form-control mb-2" placeholder="Название мероприятия">
-                                    <textarea class="form-control mb-2" name="" id="" cols="30" rows="10"
-                                        placeholder="Описание мероприятия"></textarea>
-                                    <input class="form-control mb-2" type="text" placeholder="Доп. информация">
-                                    <input class="form-control mb-2" type="text" placeholder="Адрес">
-                                    <input class="form-control mb-2" type="date" placeholder="Дата">
+                                <form method="POST" action="/editposter/{{poster.id}}/">
+                                    {% csrf_token %}
+
+                                    <input value="{{poster.name}}" name="name" type="text" class="form-control mb-2" placeholder="Название мероприятия">
+                                    <select name="ageLim" class="form-select mb-3">
+                                        <option value="0+">0+</option>
+                                        <option value="16+">16+</option>
+                                        <option value="18+">18+</option>
+                                    </select>
+                                    <textarea name="desc" class="form-control mb-2" name="" id="" cols="30" rows="10"
+                                        placeholder="Описание мероприятия">{{poster.desc}}</textarea>
+                                    <input value="{{poster.addinfo}}" name="addinfo" class="form-control mb-2" type="text" placeholder="Доп. информация">
+                                    <input name="addres" value="{{poster.addres}}" class="form-control mb-2" type="text" placeholder="Адрес">
+                                    <input value="{{poster.date}}" name="date" class="form-control mb-2" type="date" placeholder="Дата">
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger"
+                                            data-bs-dismiss="modal">Закрыть</button>
+                                        <button type="submit" class="btn btn-outline-success">Сохранить изменения</button>
+                                    </div>
                                 </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
-                                <button type="button" class="btn btn-outline-success">Сохранить изменения</button>
                             </div>
                         </div>
                     </div>
@@ -145,6 +154,7 @@
                                     <div class="poster__item-data ">
                                         <time class="fs-4 fw-semibold">{{poster.date}}</time>
                                         <p class="text-primary">{{poster.adress}}</p>
+                                        <p>{{poster.author.username}}</p>
                                     </div>
                                     <div class="poster__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
                                         data-bs-title="Настройки">
@@ -274,10 +284,10 @@
                                     <div class="poster__item-data">
                                         <time class="fs-4 fw-semibold">{{poster.date}}</time>
                                         <p class="text-primary">{{poster.addres}}</p>
-                                        {% comment %}
-                                            <!-- <p>{{poster.author.username}}</p> -->
-                                        {% endcomment %}
+
+                                        {% if user.is_staff %}
                                          <p>{{poster.author.username}}</p>
+                                        {% endif %}
                                     </div>
                                     <div class="poster__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
                                         data-bs-title="Настройки">
@@ -309,7 +319,7 @@
 
 
             <div class="col">
-                <h3 class="mb-3">Добавление афишами</h3>
+                <h3 class="mb-3">Добавление афиши</h3>
                 <form class="d-flex flex-column" method="post" action="/createposter/">
                     {% csrf_token %}
 

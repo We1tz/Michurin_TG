@@ -3,6 +3,7 @@ import os
 import sqlite3
 
 import aiogram
+from aiogram import types
 import google.cloud.dialogflow
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
@@ -14,15 +15,8 @@ from texts import txt
 
 storage = MemoryStorage()
 
-
-class User:
-    def __init__(self, name, id, offer):
-        self.name = name
-        self.id = id
-        self.offer = offer
-
-
 dialogflow = google.cloud.dialogflow
+
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "michurinbot-350715-99cf31d6b692.json"
 
 session_client = dialogflow.SessionsClient()
@@ -35,87 +29,52 @@ logging.basicConfig(level=logging.INFO)
 bot = aiogram.Bot(token=telegram_token)
 dp = aiogram.Dispatcher(bot, storage=storage)
 
+
 @dp.message_handler(commands="start")
 async def cmd_start(message: aiogram.types.Message):
     await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
+
 
 @dp.message_handler(commands="find")
 async def locate(message: aiogram.types.Message):
     maps = """Здравствуйте, ближайшее к Вам интересное место - Мичуринский краеведческий музей. Высылаю координаты:
      """
+    m = 1
+    n = 2
     await bot.send_message(message.from_user.id, maps)
-    await bot.send_message(message.from_user.id, "https://www.google.ru/maps/place/Мичуринский+краеведческий+музей/@52.8942197,40.5054534,17z/data=!3m1!4b1!4m5!3m4!1s0x413991162386f7e7:0x98f2e38b89522c6d!8m2!3d52.8942197!4d40.5076421")
-
-
-
-@dp.message_handler(commands='афиша')
-async def advert(message: types.Message):
-
-    connect = sqlite3.connect('../../../Desktop/Проекты/maib_admin/db.sqlite3')
+    connect = sqlite3.connect('maib_admin/db.sqlite3')
     cursor = connect.cursor()
-    cursor.execute("""SELECT * FROM admin_panel_poster""")
+    cursor.execute("SELECT * FROM admin_panel_geo")
+    result_geo = cursor.fetchall()
+    url_from_base = result_geo[0][3]
+    coord_all = (url_from_base.split('search/')[1])
+    coord = list(coord_all.split('+'))
+    latitude_base = coord[0]
+    longitude_base = coord[1][0:9]
+    await bot.send_location(message.from_user.id, latitude=latitude_base, longitude=longitude_base)
+    #await bot.send_message(f"https://api.telegram.org/bot{telegram_token}/sendlocation?chat_id={message.from_user.id}&latitude={latitude}&longitude={longitude}")
+
+
+@dp.message_handler(commands='ad')
+async def advert(message: aiogram.types.Message):
+    connect = sqlite3.connect('maib_admin/db.sqlite3')
+    cursor = connect.cursor()
+    cursor.execute("SELECT * FROM admin_panel_poster")
     results = cursor.fetchall()
-        # название result [id][1]
-        # описание result [id][2]
-        # дополнение к адресу result [id][3]
-        # адрес [id][4]
-        # дата [id][5]
-        # возраст
-        # организация
-        id = 5 # номер строчки в бд
+    # название result [id][1]
+    # описание result [id][2]
+    # дополнение к адресу result [id][3]
+    # адрес [id][4]
+    # дата [id][5]
+    # возраст
+    # организация
+    id = 5  # номер строчки в бд
     await bot.send_message(message.from_user.id, f'Здравствуйте, ожидается мероприятие "{results[id][1]}"\n'
-          f'Описание: {results[id][2]}\n'
-          f'Мероприятие походит по адресу {results[id][4]}, {results[2][3]}\n'
-          f'Дата: {results[id][5]}\n'
-          f'Возраст: {results[id][6]}\n'
-        )
-
-
-@dp.message_handler(commands='предложить')
-async def offer_update(message: types.Message):
-    message_for_user = (f"""Здравствуй, путник {message.from_user.username} \n
-Коли ты забрел в мою усадьбу, считай своим долгом внести свою лепту в ее процветание.  \n
-
-Чтобы помочь развитию проекта, пришли одним сообщением вопрос, который хочешь добавить в бота, а также ответ, пример ниже:  \n
-
-"Какой ваш родной город?" - "Я родился в Рязани, однако судьба привела меня в город Козлов, который позже был назван моим именем" \n
-После модерации ваш вопрос будет добавлен в бота""")
-
-    await message.answer(message_for_user)
-    user = User(message.from_user.username, message.from_user.id, '')
-    print('Пользователь создан')
-    connect = sqlite3.connect('../../../Desktop/Проекты/users.db')
-    cursor = connect.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users(
-                        name TEXT,
-                        id TEXT,
-                        offer TEXT
-                    )""")
-    cursor.execute(f"SELECT id FROM users WHERE id = {user.id}")
-    data = cursor.fetchone()
-    if data is None:
-        information = (user.name, user.id, user.offer)
-        cursor.execute('INSERT INTO users VALUES(?, ?, ?);', information)
-        connect.commit()
-    else:
-        print('Пропуск создания пользователь уже существует')
-    await Test.Q9.set()
-
-
-@dp.message_handler(state=Test.Q9)
-async def offer_update_1(message: types.Message, state: FSMContext):
-    new_offers = message.text
-
-    await state.update_data(new_offers=new_offers)
-
-    connect = sqlite3.connect('../../../Desktop/Проекты/users.db')
-    cursor = connect.cursor()
-    user = User(message.from_user.first_name, message.from_user.id, new_offers)
-    cursor.execute('UPDATE users SET offer=? WHERE id=?', (user.offer, user.id))
-    connect.commit()
-
-    await message.answer('Ответ принят, спасибо!')
-    await state.reset_state()
+                                                 f'Описание: {results[id][2]}\n'
+                                                 f'Мероприятие походит по адресу {results[id][4]}, {results[2][3]}\n'
+                                                 f'Дата: {results[id][5]}\n'
+                                                 f'Возраст: {results[id][6]}\n'
+                           )
 
 
 @dp.message_handler(commands='quest')
@@ -124,8 +83,7 @@ async def enter_quest(message: types.Message):
         """  
         Приветствую, Вы начали квест-викторину
         Я задаю Вам вопросы, а Вы на них отвечаете     
-        """
-    )
+        """)
     await message.answer(hi)
     ask1 = (
         "Вопрос №1. \n\n"
@@ -238,7 +196,7 @@ async def message_dialogflow(message: aiogram.types.Message):
         'answer': response.query_result.fulfillment_text
     }
 
-    with open('../../../Desktop/Проекты/log.txt', 'a', encoding='utf-8') as txt:
+    with open('log.txt', 'a', encoding='utf-8') as txt:
         print(log, file=txt)
 
 

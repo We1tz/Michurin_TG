@@ -53,3 +53,4 @@
 {'Name': 'Weitzz', 'ID': 1922232899, 'message': 'Ага', 'answer': 'Фантастика.'}
 {'Name': 'Weitzz', 'ID': 1922232899, 'message': '1', 'answer': ''}
 {'Name': 'Weitzz', 'ID': 1922232899, 'message': 'Мичурин-Фест', 'answer': 'Мне было 17 лет, когда я приехал в Козлов'}
+{'Name': 'Weitzz', 'ID': 1922232899, 'message': '/help', 'answer': ''}

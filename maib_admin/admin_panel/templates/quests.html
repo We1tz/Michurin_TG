@@ -4,78 +4,355 @@
 {% block content %}
 
 
-    <div class="main">
-        {% if user.is_authenticated and user.is_staff %}
-        <div class="poster container mt-5">
-            <div class="hello-text mb-5">
-                <h2>Приветствую тебя, Администратор</h2>
-            </div>
+<div class="main">
+    {% if user.is_authenticated and user.is_staff %}
+    <div class="poster container mt-5">
+        <div class="hello-text mb-5">
+            <h2>Приветствую тебя, Администратор</h2>
+        </div>
 
 
-            <div class="row align-items-start">
-                <div class="col mb-5">
-                    <h3 class="mb-2">Управление викторинами</h3>
-                    <div class="quests-list mb-5">
-                        <div class="card w-75 mb-3">
-                            <div class="card-body">
-                                <div class="quests__item-title d-flex align-items-start pb-2">
-                                    <div class="img-quests pr-5">
+        <div class="row align-items-start">
+            <div class="col mb-5">
+                <h3 class="mb-2">Управление викторинами</h3>
+                <div class="quests-list mb-5">
+                    <div class="card w-75 mb-3">
+                        <div class="card-body">
+                            <div class="quests__item-title d-flex align-items-start pb-2">
+                                <div class="img-quests pr-5">
+                                    {% comment %}
                                         <img src="img/quests.svg" alt="">
-                                    </div>
-                                    <h5>“Знание города
-                                        Мичуринска”</h6>
-
+                                    {% endcomment %}
                                 </div>
-                                <div class="quests__item-content">
-                                    <div class="quests__item-info d-flex align-items-center justify-content-between">
-                                        <div class="quests__item-data">
-                                            <p class="">8 вопрос</p>
-                                        </div>
-                                        <div class="quests__item-settings" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" data-bs-title="Настройки">
+                                <h5>“Знание города
+                                    Мичуринска”</h6>
+
+                            </div>
+                            <div class="quests__item-content">
+                                <div class="quests__item-info d-flex align-items-center justify-content-between">
+                                    <div class="quests__item-data">
+                                        <p class="">8 вопрос</p>
+                                    </div>
+                                    <div class="quests__item-settings" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        data-bs-title="Настройки">
+                                        {% comment %}
                                             <img src="img/settings.svg" alt="">
-                                        </div>
+                                        {% endcomment %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-outline-primary text-start w-75">Новая викторина</button>
-                </div>
-
-
-
-                <div class="col">
-                    <form class="d-flex flex-column" action="">
-                        <input type="text" class="form-control" placeholder="Вопрос">
-                        <div class="quests_question mt-2">
-                            <input type="text" placeholder="Вариант ответа" class="quests_question">
-                            <div class="d-flex">
-                                <label for="" class="d-flex align-items-center">
-                                    <input type="checkbox" name="" id="">
-                                    <article class="p-1">Верно / Не верно</article>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="add_varqestions d-flex flex-column w-100 px-4 py-3 mt-2">
-                            <article class="text-center">Добавить новый вариант ответа</article>
-                        </div>
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-outline-primary">Добавить вопрос</button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
-        
-        {% else %}
 
-        <div class="container mt-5 d-flex justify-content-center flex-column">
-            <h1 class="text-center mb-5">У вас нет доступа к этой странице</h1>
-            <a href="/poster" class="btn btn-primary">Вернуться обратно</a>
-        </div>
 
-        {% endif %}
+
+            <div class="col">
+                <form method="POST" action="/addquiz/">
+                    {% csrf_token %}
+                    <div class="title_quiz mb-5">
+                        <input placeholder="Название викторины" class="form-control" name="title" type="text">
+                    </div>
+
+                    <div class="container_quiz">
+                        <div class="quiz">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_1" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_1_1" type="text">
+                                    <input type="text" name="iscorrect_1_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_1_2" type="text">
+                                    <input type="text" name="iscorrect_1_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_1_3" type="text">
+                                    <input type="text" name="iscorrect_1_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_1_4" type="text">
+                                    <input type="text" name="iscorrect_1_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_2" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_2_1" type="text">
+                                    <input type="text" name="iscorrect_2_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_2_2" type="text">
+                                    <input type="text" name="iscorrect_2_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_2_1" type="text">
+                                    <input type="text" name="iscorrect_2_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_2_2" type="text">
+                                    <input type="text" name="iscorrect_2_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_3" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_3_1" type="text">
+                                    <input type="text" name="iscorrect_3_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_3_2" type="text">
+                                    <input type="text" name="iscorrect_3_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_3_3" type="text">
+                                    <input type="text" name="iscorrect_3_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_3_4" type="text">
+                                    <input type="text" name="iscorrect_3_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_4" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_4_1" type="text">
+                                    <input type="text" name="iscorrect_4_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_4_2" type="text">
+                                    <input type="text" name="iscorrect_4_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_4_1" type="text">
+                                    <input type="text" name="iscorrect_4_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_4_2" type="text">
+                                    <input type="text" name="iscorrect_4_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_5" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_5_1" type="text">
+                                    <input type="text" name="iscorrect_5_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_5_2" type="text">
+                                    <input type="text" name="iscorrect_5_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_5_1" type="text">
+                                    <input type="text" name="iscorrect_5_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_5_2" type="text">
+                                    <input type="text" name="iscorrect_5_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_6" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_6_1" type="text">
+                                    <input type="text" name="iscorrect_6_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_6_2" type="text">
+                                    <input type="text" name="iscorrect_6_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_6_1" type="text">
+                                    <input type="text" name="iscorrect_6_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_6_2" type="text">
+                                    <input type="text" name="iscorrect_6_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_7" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_7_1" type="text">
+                                    <input type="text" name="iscorrect_7_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_7_2" type="text">
+                                    <input type="text" name="iscorrect_7_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_7_1" type="text">
+                                    <input type="text" name="iscorrect_7_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_7_2" type="text">
+                                    <input type="text" name="iscorrect_7_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_8" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_8_1" type="text">
+                                    <input type="text" name="iscorrect_8_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_8_2" type="text">
+                                    <input type="text" name="iscorrect_8_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_8_1" type="text">
+                                    <input type="text" name="iscorrect_8_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_8_2" type="text">
+                                    <input type="text" name="iscorrect_8_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_9" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_9_1" type="text">
+                                    <input type="text" name="iscorrect_9_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_9_2" type="text">
+                                    <input type="text" name="iscorrect_9_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_9_1" type="text">
+                                    <input type="text" name="iscorrect_9_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_9_2" type="text">
+                                    <input type="text" name="iscorrect_9_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz mt-5">
+                            <div class="titleq mb-3 d-flex">
+
+                                <input placeholder="Текст вопроса" class="form-control" name="textQ_10" type="text">
+                            </div>
+                            <div class="c_container d-flex">
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_10_1" type="text">
+                                    <input type="text" name="iscorrect_10_1" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_10_2" type="text">
+                                    <input type="text" name="iscorrect_10_2" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_10_1" type="text">
+                                    <input type="text" name="iscorrect_10_3" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                                <div class="c_item">
+                                    <input placeholder="Текст ответа" class="form-control" name="textC_10_2" type="text">
+                                    <input type="text" name="iscorrect_10_4" class="form-control"
+                                        placeholder="Верно/Неверно">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
+
+{% else %}
+
+<div class="container mt-5 d-flex justify-content-center flex-column">
+    <h1 class="text-center mb-5">У вас нет доступа к этой странице</h1>
+    <a href="/poster" class="btn btn-primary">Вернуться обратно</a>
+</div>
+
+{% endif %}
+</div>
 
 {% endblock %}

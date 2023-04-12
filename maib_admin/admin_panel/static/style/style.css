@@ -1,9 +1,16 @@
+.container_quiz{
+    height: 500px;
+    overflow-x: scroll;
+}
+
+
 label{
     display: none;
 }
-.sad_img img{
+/* .sad_img img{
     
-}
+} */
+
 
 .password-pass2 {
     background: url(../img/pass2.svg) no-repeat right center;

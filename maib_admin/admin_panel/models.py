@@ -18,3 +18,27 @@ class Geo(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Quiz(models.Model):
+    title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.title
+
+
+class Question(models.Model):
+    textQ = models.CharField(max_length=255)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+
+    def __str__(self):
+        return self.textQ
+
+
+class Choice(models.Model):
+    textC = models.CharField(max_length=255)
+    iscorrect = models.BooleanField(default=False)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
+
+    def __str__(self):
+        return self.textC

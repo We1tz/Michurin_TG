@@ -2,16 +2,14 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from .form import LoginForm, GeoForm
 from django.contrib.auth import authenticate, login
-from .models import Geo, Poster
+from .models import Geo, Poster, Quiz, Question, Choice
 # Create your views here.
 
 
 def index(request):
 
     if request.user.is_authenticated:
-            return render(request, 'index.html', {'name': request.user.username})
-    elif not request.user.is_staff:
-        return redirect('poster/')
+        return render(request, 'index.html', {'name': request.user.username})
     else:
         return redirect('login/')
     
@@ -102,6 +100,22 @@ def editgeo(request, id):
 def quest(request):
     return render(request, 'quests.html')
 
+def add_quiz(request):
+   if request.method == 'POST':
+       title = request.POST['title']
+       quiz = Quiz(title=title)
+       quiz.save()
+
+       for i in range(1, 11):
+        textQ = request.POST.get(f'textQ_{i}')
+        question = Question.objects.create(textQ=textQ, quiz=quiz)
+        for j in range(1, 5):
+            textC = request.POST.get(f'textC_{i}_{j}')
+            iscorrect = request.POST.get(f'iscorrect_{i}_{j}')
+            choice = Choice.objects.create(textC=textC, iscorrect=iscorrect, question=question)
+   return redirect('/quest')       
+
+
 
 def loginuser(request):
     form = LoginForm(request.POST)
@@ -119,7 +133,11 @@ def loginuser(request):
                 return HttpResponse('Disabled account')
 
         else:
-            return HttpResponse('Invalid login')
+            return redirect('/invalid')
 
 
     return render(request, 'login.html', {'form': form})
+
+
+def invalid_login(request):
+    return render(request, 'invalid.html')
