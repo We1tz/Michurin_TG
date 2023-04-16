@@ -5,12 +5,17 @@ import sqlite3
 import math
 import aiogram
 from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import google.cloud.dialogflow
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
 import re
 
-from geopy.distance import geodesic
+
+class EventChoice(StatesGroup):
+    waiting_for_event_choice = State()
+
 
 import keyboards.locate
 from config import telegram_token
@@ -104,6 +109,30 @@ async def answer_q1(message: types.Message, state: FSMContext):
     await bot.send_message(message.from_user.id, f"Ближайшая к вам достопримечательность: {closest_name}", reply_markup=start_keyboard.keyboard)
     await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1])
 
+@dp.callback_query_handler(lambda callback_query: True)
+async def process_callback_button(callback_query: types.CallbackQuery):
+    # Разбиваем строку callback_data на параметры с помощью символа "="
+    callback_data = callback_query.data
+    event_id = int(callback_data.split("=")[1])
+
+    # Получаем информацию о мероприятии из базы данных
+    connect = sqlite3.connect('maib_admin/db.sqlite3')
+    cursor = connect.cursor()
+    cursor.execute("SELECT * FROM admin_panel_poster WHERE id = ?", (event_id,))
+    event_info = cursor.fetchone()
+
+    # Отправляем сообщение с информацией о мероприятии
+    await bot.send_message(
+        chat_id=callback_query.from_user.id,
+        text=f'Здравствуйте, ожидается мероприятие "{event_info[1]}"\n'
+             f'Описание: {event_info[2]}\n'
+             f'Мероприятие походит по адресу {event_info[4]}, ({event_info[3]})\n'
+             f'Дата: {event_info[5]}\n'
+             f'Возраст: {event_info[6]}\n'
+    )
+
+    await bot.answer_callback_query(callback_query.id)
+
 
 @dp.message_handler(commands='ad')
 async def advert(message: aiogram.types.Message):
@@ -111,20 +140,22 @@ async def advert(message: aiogram.types.Message):
     cursor = connect.cursor()
     cursor.execute("SELECT * FROM admin_panel_poster")
     results = cursor.fetchall()
-    # название result [id][1]
-    # описание result [id][2]
-    # дополнение к адресу result [id][3]
-    # адрес [id][4]
-    # дата [id][5]
-    # возраст
-    # организация
-    id = 5  # номер строчки в бд
-    await bot.send_message(message.from_user.id, f'Здравствуйте, ожидается мероприятие "{results[id][1]}"\n'
-                                                 f'Описание: {results[id][2]}\n'
-                                                 f'Мероприятие походит по адресу {results[id][4]}, {results[2][3]}\n'
-                                                 f'Дата: {results[id][5]}\n'
-                                                 f'Возраст: {results[id][6]}\n'
-                           )
+
+    buttons = []
+    for i, event in enumerate(results):
+        button = InlineKeyboardButton(text=event[1], callback_data=f"event_id={event[0]}")
+        buttons.append([button])
+
+    # создаем inline клавиатуру с кнопками
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=buttons)
+
+    await bot.send_message(
+        chat_id=message.from_user.id,
+        text="Выберите мероприятие:",
+        reply_markup=reply_markup
+    )
+
+
 
 
 @dp.message_handler(commands='quest')
