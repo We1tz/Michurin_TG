@@ -13,10 +13,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 import re
 
 
-class EventChoice(StatesGroup):
-    waiting_for_event_choice = State()
-
-
 import keyboards.locate
 from config import telegram_token
 from keyboards import start_keyboard, locate
@@ -91,6 +87,7 @@ async def answer_q1(message: types.Message, state: FSMContext):
     min_distance = None
     closest_coordinate = None
     closest_name = None
+    all_coordinates = []
 
     # перебираем все координаты из базы данных и находим самую близкую
     for row in result_geo:
@@ -104,10 +101,26 @@ async def answer_q1(message: types.Message, state: FSMContext):
             min_distance = dist
             closest_coordinate = (latitudes, longitudes)
             closest_name = name
+        all_coordinates.append((name, (latitudes, longitudes), dist))
 
-    # отправляем пользователю ближайшую координату
+    # создаем инлайн клавиатуру с более далекими достопримечательностями
+    inline_keyboard = types.InlineKeyboardMarkup(row_width=1)
+    for name, coordinate, dist in sorted(all_coordinates, key=lambda x: x[2])[1:3]:
+        inline_keyboard.add(types.InlineKeyboardButton(
+            text=f"{name} ({dist:.2f} км)",
+            callback_data=f"location_{coordinate[0]}_{coordinate[1]}"
+        ))
+
+    # отправляем пользователю ближайшую координату и инлайн клавиатуру с более далекими достопримечательностями
     await bot.send_message(message.from_user.id, f"Ближайшая к вам достопримечательность: {closest_name}", reply_markup=start_keyboard.keyboard)
-    await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1])
+    await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1], reply_markup=inline_keyboard)
+
+@dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('location_'))
+async def process_location_callback(callback_query: types.CallbackQuery):
+    _, latitude, longitude = callback_query.data.split('_')
+    await bot.send_location(callback_query.from_user.id, latitude=float(latitude), longitude=float(longitude))
+    await bot.answer_callback_query(callback_query.id)
+
 
 @dp.callback_query_handler(lambda callback_query: True)
 async def process_callback_button(callback_query: types.CallbackQuery):
@@ -154,7 +167,6 @@ async def advert(message: aiogram.types.Message):
         text="Выберите мероприятие:",
         reply_markup=reply_markup
     )
-
 
 
 
