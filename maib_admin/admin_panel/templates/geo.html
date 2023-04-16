@@ -56,8 +56,18 @@
         </div>
 
         <div class="mobile">
-            <h3 class="mb-2">Управление локацией</h3>
+            <h3 class="mb-2">Управление геолокацией</h3>
             <div class="geo-list">
+                {% if geo_len == 0 %}
+                    <div class="d-flex align-items-center">
+                        <div class="sad_img m-2">
+                            <img class="" src="../static/img/sad.svg" alt="">
+                        </div>
+                        <h2 class="mt-2">Геолокации отсутсвуют</h2>
+                    </div>
+    
+                    {% else %}
+
                 {% for geo in geo_list %}
 
                 <div class="modal fade" id="editGeoMobile" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -149,13 +159,25 @@
                 </div>
 
                 {% endfor %}
+                {% endif %}
             </div>
         </div>
 
         <div class="row align-items-start">
             <div class="col mb-5 desktop">
-                <h3 class="mb-2">Управление локацией</h3>
+                <h3 class="mb-2">Управление геолокацией</h3>
                 <div class="geo-list">
+
+                    {% if geo_len == 0 %}
+                    <div class="d-flex align-items-center">
+                        <div class="sad_img m-2">
+                            <img class="" src="../static/img/sad.svg" alt="">
+                        </div>
+                        <h5 class="mt-2">Геолокации отсутсвуют</h5>
+                    </div>
+    
+                    {% else %}
+
                     {% for geo in geo_list %}
 
                     <div class="modal fade" id="editGeo" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -246,12 +268,14 @@
                     </div>
 
                     {% endfor %}
+                    {% endif %}
                 </div>
             </div>
 
 
 
             <div class="col">
+                <h3 class="mb-3">Добавление геолокации</h3>
                 <form class="d-flex flex-column" method="POST" action="/creategeo/">
                     {% csrf_token %}
 

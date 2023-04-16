@@ -17,6 +17,7 @@ urlpatterns = [
     path('editgeo/<int:id>/', views.editgeo),
     path('quest/', views.quest),
     path('addquiz/', views.add_quiz),
+    path('delete_quiz/<int:id>/', views.delete_quiz),
     path('', views.index),
     path('admin/', admin.site.urls),
 ]

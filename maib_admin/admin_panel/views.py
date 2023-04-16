@@ -63,8 +63,9 @@ def deleteposter(request, id):
 
 def geo(request):
     geo_list = Geo.objects.all()
+    geo_len = len(geo_list)
     
-    return render(request, 'geo.html', {'geo_list': geo_list})
+    return render(request, 'geo.html', {'geo_list': geo_list, 'geo_len': geo_len})
 
 
 def creategeo(request):
@@ -98,7 +99,11 @@ def editgeo(request, id):
     
 
 def quest(request):
-    return render(request, 'quests.html')
+    quest_list = Quiz.objects.all()
+    quest_len = len(quest_list)
+
+    
+    return render(request, 'quests.html', {"quest_list": quest_list, "q_len": quest_len})
 
 def add_quiz(request):
    if request.method == 'POST':
@@ -113,7 +118,14 @@ def add_quiz(request):
             textC = request.POST.get(f'textC_{i}_{j}')
             iscorrect = request.POST.get(f'iscorrect_{i}_{j}')
             choice = Choice.objects.create(textC=textC, iscorrect=iscorrect, question=question)
-   return redirect('/quest')       
+   return redirect('/quest')
+
+def delete_quiz(request, id):
+    q_item = Quiz.objects.get(id = id)
+    q_item.delete()
+
+
+    return redirect('/quest')
 
 
 

@@ -1,15 +1,20 @@
 import logging
 import os
+import random
 import sqlite3
-
+import math
 import aiogram
 from aiogram import types
 import google.cloud.dialogflow
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
+import re
 
+from geopy.distance import geodesic
+
+import keyboards.locate
 from config import telegram_token
-from keyboards import start_keyboard
+from keyboards import start_keyboard, locate
 from states import Test
 from texts import txt
 
@@ -32,27 +37,72 @@ dp = aiogram.Dispatcher(bot, storage=storage)
 
 @dp.message_handler(commands="start")
 async def cmd_start(message: aiogram.types.Message):
+    buttons = [
+        types.InlineKeyboardButton(text="Telegram", url="https://t.me/+HFKvzFZaOvdkNDVi "),
+        types.InlineKeyboardButton(text="VK", url="https://vk.com/club217810823")
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    keyboard.add(*buttons)
     await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
+    await message.answer("Ещё подпишитесь на наши каналы, чтобы узнавать об обновлениях раньше других :) \n", reply_markup=keyboard)
 
 
 @dp.message_handler(commands="find")
-async def locate(message: aiogram.types.Message):
-    maps = """Здравствуйте, ближайшее к Вам интересное место - Мичуринский краеведческий музей. Высылаю координаты:
-     """
-    m = 1
-    n = 2
-    await bot.send_message(message.from_user.id, maps)
+async def locate(message: aiogram.types.Message, state: FSMContext):
+    await bot.send_message(message.from_user.id, 'Здравствуйте, нажмите на кнопку, чтобы отправить своё местоположение', reply_markup=keyboards.locate.keyboard_location)
+    await Test.Q9.set()
+    await state.update_data(command="find")
+
+@dp.message_handler(state=Test.Q9, content_types=types.ContentTypes.LOCATION)
+async def answer_q1(message: types.Message, state: FSMContext):
+    # получение локации и координат пользователя
+    data = await state.get_data()
+    command = data.get("command")
+    latitude_1 = message.location.latitude
+    longitude_2 = message.location.longitude
+    await state.finish()
+
+    # функция для расчета расстояния между двумя координатами
+    def distance(lat1, lon1, lat2, lon2):
+        R = 6371  # радиус Земли в км
+        dLat = math.radians(lat2 - lat1)
+        dLon = math.radians(lon2 - lon1)
+        a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(math.radians(lat1)) \
+            * math.cos(math.radians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2)
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
+
+    # получение списка координат из базы данных
     connect = sqlite3.connect('maib_admin/db.sqlite3')
     cursor = connect.cursor()
     cursor.execute("SELECT * FROM admin_panel_geo")
     result_geo = cursor.fetchall()
-    url_from_base = result_geo[0][3]
-    coord_all = (url_from_base.split('search/')[1])
-    coord = list(coord_all.split('+'))
-    latitude_base = coord[0]
-    longitude_base = coord[1][0:9]
-    await bot.send_location(message.from_user.id, latitude=latitude_base, longitude=longitude_base)
-    #await bot.send_message(f"https://api.telegram.org/bot{telegram_token}/sendlocation?chat_id={message.from_user.id}&latitude={latitude}&longitude={longitude}")
+
+    # получение координат пользователя
+    latitude_user = latitude_1
+    longitude_user = longitude_2
+
+    # инициализация переменных для поиска самой близкой координаты
+    min_distance = None
+    closest_coordinate = None
+    closest_name = None
+
+    # перебираем все координаты из базы данных и находим самую близкую
+    for row in result_geo:
+        url = row[3]
+        name = row[1]
+        match = re.search(r"@([\d\.]+),([\d\.]+)", url)
+        latitudes = float(match.group(1))
+        longitudes = float(match.group(2))
+        dist = distance(latitudes, longitudes, latitude_user, longitude_user)
+        if min_distance is None or dist < min_distance:
+            min_distance = dist
+            closest_coordinate = (latitudes, longitudes)
+            closest_name = name
+
+    # отправляем пользователю ближайшую координату
+    await bot.send_message(message.from_user.id, f"Ближайшая к вам достопримечательность: {closest_name}", reply_markup=start_keyboard.keyboard)
+    await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1])
 
 
 @dp.message_handler(commands='ad')
