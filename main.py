@@ -56,7 +56,7 @@ async def cmd_start(message: aiogram.types.Message):
     await asyncio.sleep(3 * 60 * 60)
     await message.answer("Прошло уже 3 часа, а ты не проявляешь активность, я уже яблону посадил")
 
-    # Отправка текста спустя день
+    # Отправка текста спустя 1 день
     await asyncio.sleep(24 * 60 * 60)
     await message.answer("Привет, ты давно не задаешь мне вопросы, не хочешь узнать что-то новое?")
 
