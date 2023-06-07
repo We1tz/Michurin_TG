@@ -1,26 +1,43 @@
-import logging
-import os
-import random
-import sqlite3
 import math
-import aiogram
-from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-import google.cloud.dialogflow
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import logging
+import math
+import os
+import re
+import sqlite3
+from pathlib import Path
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-import re
+from aiogram.types import Message, InputFile
 
+import aiogram
+import google.cloud.dialogflow
+import google.cloud.dialogflow
+from aiogram import Bot, Dispatcher, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher import FSMContext
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from dotenv import load_dotenv
 
+import config
 import keyboards.locate
-from config import telegram_token
-from keyboards import start_keyboard, locate
+from keyboards import start_keyboard
 from states import Test
+from stt import STT
 from texts import txt
+from tts import TTS
+import asyncio
 
+load_dotenv()
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+bot = Bot(token=config.telegram_token)
+logging.basicConfig(level=logging.INFO)
 storage = MemoryStorage()
-
+dp = Dispatcher(bot, storage=storage)
+tts = TTS()
+stt = STT()
 dialogflow = google.cloud.dialogflow
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "michurinbot-350715-99cf31d6b692.json"
@@ -31,13 +48,40 @@ session_id = 'sessions'
 language_code = 'ru'
 session = session_client.session_path(project_id, session_id)
 
-logging.basicConfig(level=logging.INFO)
-bot = aiogram.Bot(token=telegram_token)
-dp = aiogram.Dispatcher(bot, storage=storage)
-
 
 @dp.message_handler(commands="start")
 async def cmd_start(message: aiogram.types.Message):
+    await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
+    # Отправка текста спустя 3 часа
+    await asyncio.sleep(3 * 60 * 60)
+    await message.answer("Прошло уже 3 часа, а ты не проявляешь активность, я уже яблону посадил")
+
+    # Отправка текста спустя день
+    await asyncio.sleep(24 * 60 * 60)
+    await message.answer("Привет, ты давно не задаешь мне вопросы, не хочешь узнать что-то новое?")
+
+    # Отправка текста спустя неделю
+    await asyncio.sleep(7 * 24 * 60 * 60)
+    await message.answer("Прошла целая неделя, я успел уже вывести новый сорт, а от тебя еще нет активности")
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+
+    username = message.from_user.username
+    message_id = message.from_user.id
+
+    # Проверяем существование пользователя в базе данных
+    cursor.execute('SELECT * FROM users WHERE message_id = ?', (message_id,))
+    existing_user = cursor.fetchone()
+
+    if existing_user:
+        print('Пользователь существует')
+    else:
+        cursor.execute('INSERT INTO users (username, message_id) VALUES (?, ?)', (username, message_id))
+        connection.commit()
+        print('Пользователь добавлен в базу данных')
+
+    connection.close()
+
     buttons = [
         types.InlineKeyboardButton(text="Telegram", url="https://t.me/+HFKvzFZaOvdkNDVi "),
         types.InlineKeyboardButton(text="VK", url="https://vk.com/club217810823")
@@ -45,14 +89,106 @@ async def cmd_start(message: aiogram.types.Message):
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
     await message.answer(txt.hello, reply_markup=start_keyboard.keyboard)
-    await message.answer("Ещё подпишитесь на наши каналы, чтобы узнавать об обновлениях раньше других :) \n", reply_markup=keyboard)
+    await message.answer("Ещё подпишитесь на наши каналы, чтобы узнавать об обновлениях раньше других :) \n",
+                         reply_markup=keyboard)
+
+
+@dp.message_handler(commands="mail")
+async def mail_to_user(message: Message, state: FSMContext):
+    print(message.from_user.id)
+    right_user = ['1922232899', '129991831']
+    if str(message.from_user.id) == str(right_user[0]) or str(message.from_user.id) == str(right_user[1]):
+        await message.answer('Здравствуйте, вы авторизованы. \n'
+                             'Какое сообщение или медиа-файл необходимо отправить? \n')
+        await Test.Q20.set()
+        await state.update_data(command="mail")
+    else:
+        await message.answer('Ошибка доступа')
+
+
+@dp.message_handler(content_types=types.ContentTypes.ANY, state=Test.Q20)
+async def send_mail_message(message: Message, state: FSMContext):
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+    cursor.execute('SELECT message_id FROM users')
+    message_ids = cursor.fetchall()
+    data = await state.get_data()
+
+    media_types = ["photo", "audio", "video"]
+    if message.content_type in media_types:
+        for message_id in message_ids:
+            chat_id = int(message_id[0])
+            if message.content_type == "photo":
+                media = message.photo[-1].file_id
+                await bot.send_photo(chat_id, media)
+            elif message.content_type == "audio":
+                media = message.audio.file_id
+                await bot.send_audio(chat_id, media)
+            elif message.content_type == "video":
+                media = message.video.file_id
+                await bot.send_video(chat_id, media, supports_streaming=True)
+    else:
+        message_from_users = message.text
+        for message_id in message_ids:
+            chat_id = int(message_id[0])
+            await bot.send_message(chat_id, text=message_from_users)
+
+    await state.finish()
+    connection.close()
+
+
+
+@dp.message_handler(content_types=[
+    types.ContentType.VOICE,
+    types.ContentType.AUDIO,
+    types.ContentType.DOCUMENT
+]
+)
+async def voice_message_handler(message: types.Message, state: FSMContext):
+    """
+    Обработчик на получение голосового и аудио сообщения.
+    """
+    if message.content_type == types.ContentType.VOICE:
+        file_id = message.voice.file_id
+    elif message.content_type == types.ContentType.AUDIO:
+        file_id = message.audio.file_id
+    elif message.content_type == types.ContentType.DOCUMENT:
+        file_id = message.document.file_id
+    else:
+        await message.reply("Формат документа не поддерживается")
+        return
+
+    file = await bot.get_file(file_id)
+    file_path = file.file_path
+    file_on_disk = Path("", f"{file_id}.tmp")
+    await bot.download_file(file_path, destination=file_on_disk)
+    await message.reply("Аудио получено")
+
+    text = stt.audio_to_text(file_on_disk)
+    if not text:
+        text = "Формат документа не поддерживается"
+
+    os.remove(file_on_disk)
+
+    text_input = dialogflow.TextInput(
+        text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
+    response = session_client.detect_intent(
+        session=session, query_input=query_input)
+    if response.query_result.fulfillment_text:
+        await bot.send_message(message.from_user.id, response.query_result.fulfillment_text)
+    else:
+        await bot.send_message(message.from_user.id, "Я вас не понял, мне пора в сад")
+
 
 
 @dp.message_handler(commands="find")
 async def locate(message: aiogram.types.Message, state: FSMContext):
-    await bot.send_message(message.from_user.id, 'Здравствуйте, нажмите на кнопку, чтобы отправить своё местоположение', reply_markup=keyboards.locate.keyboard_location)
+    await bot.send_message(message.from_user.id, 'Здравствуйте, нажмите на кнопку, чтобы отправить своё местоположение',
+                           reply_markup=keyboards.locate.keyboard_location)
     await Test.Q9.set()
     await state.update_data(command="find")
+
 
 @dp.message_handler(state=Test.Q9, content_types=types.ContentTypes.LOCATION)
 async def answer_q1(message: types.Message, state: FSMContext):
@@ -79,17 +215,14 @@ async def answer_q1(message: types.Message, state: FSMContext):
     cursor.execute("SELECT * FROM admin_panel_geo")
     result_geo = cursor.fetchall()
 
-    # получение координат пользователя
     latitude_user = latitude_1
     longitude_user = longitude_2
 
-    # инициализация переменных для поиска самой близкой координаты
     min_distance = None
     closest_coordinate = None
     closest_name = None
     all_coordinates = []
-
-    # перебираем все координаты из базы данных и находим самую близкую
+    # обработка google map url
     for row in result_geo:
         url = row[3]
         name = row[1]
@@ -112,8 +245,11 @@ async def answer_q1(message: types.Message, state: FSMContext):
         ))
 
     # отправляем пользователю ближайшую координату и инлайн клавиатуру с более далекими достопримечательностями
-    await bot.send_message(message.from_user.id, f"Ближайшая к вам достопримечательность: {closest_name}", reply_markup=start_keyboard.keyboard)
-    await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1], reply_markup=inline_keyboard)
+    await bot.send_message(message.from_user.id, f"Ближайшая к вам достопримечательность: {closest_name}",
+                           reply_markup=start_keyboard.keyboard)
+    await bot.send_location(message.from_user.id, latitude=closest_coordinate[0], longitude=closest_coordinate[1],
+                            reply_markup=inline_keyboard)
+
 
 @dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('location_'))
 async def process_location_callback(callback_query: types.CallbackQuery):
@@ -167,7 +303,6 @@ async def advert(message: aiogram.types.Message):
         text="Выберите мероприятие:",
         reply_markup=reply_markup
     )
-
 
 
 @dp.message_handler(commands='quest')
